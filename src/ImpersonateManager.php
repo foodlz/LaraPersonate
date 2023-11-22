@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Octopy\Impersonate\Contracts\Storage;
 use Octopy\Impersonate\Exceptions\ImpersonateException;
 use Octopy\Impersonate\Storage\SessionStorage;
+use Octopy\Impersonate\Events\BeginImpersonation;
+use Octopy\Impersonate\Events\LeaveImpersonation;
 use ReflectionClass;
 use Throwable;
 
@@ -142,6 +144,10 @@ final class ImpersonateManager
 
             // then, set impersonator to current user
             $this->guard->login($impersonated);
+
+            event(new BeginImpersonation(
+                $impersonator, $impersonated
+            ));
         }
 
         return $impersonated;
@@ -160,6 +166,10 @@ final class ImpersonateManager
 
             // then, we need to clear storage
             $this->storage->clearStorage();
+
+            event(new LeaveImpersonation(
+                $impersonator, $impersonated
+            ));
         }
 
         return true;
