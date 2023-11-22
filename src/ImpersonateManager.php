@@ -161,8 +161,12 @@ final class ImpersonateManager
     public function leave() : bool
     {
         if ($this->isInImpersonation()) {
+
+            $impersonator = $this->getImpersonator();
+            $impersonated = $this->getImpersonated();
+
             // first, we need set current user to impersonator
-            $this->guard->login($this->getImpersonator());
+            $this->guard->login($impersonator);
 
             // then, we need to clear storage
             $this->storage->clearStorage();
